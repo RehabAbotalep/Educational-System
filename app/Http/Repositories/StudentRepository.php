@@ -106,7 +106,20 @@ class StudentRepository implements StudentInterface
         if($request->has('groups')){
             foreach($request->groups as $group){
                 $addedGroup = explode(',', $group);
-                if($addedGroup[3] == 1){
+                $studentGroup = GroupStudent::where('student_id', $student->id)
+                                            ->where('group_id', $addedGroup[0])
+                                            ->first();
+                if($studentGroup){
+                    if($addedGroup[3] == 1){
+                        $studentGroup->delete();
+                    }else{
+                        $studentGroup->update(['count' => $addedGroup[1], 'price' =>$addedGroup[2] ]);
+
+                    }
+                }else{
+                    $this->addStudentToGroup($group, $student->id);
+                }
+                /*if($addedGroup[3] == 1){
                     GroupStudent::where('student_id', $student->id)
                                 ->where('group_id', $addedGroup[0])
                                 ->delete();
@@ -115,7 +128,7 @@ class StudentRepository implements StudentInterface
                         ['student_id' => $student->id, 'group_id' => $addedGroup[0]],
                         ['count' => $addedGroup[1], 'price' => $addedGroup[2]],
                     );
-                }
+                }*/
             }
         }
         return $this->apiResponse(200,'Updated Successfully');
