@@ -28,11 +28,6 @@ class StudentController extends Controller
         return $this->studentInterface->addStudent($request);
     }
 
-    public function addStudentToGroup(Request $request)
-    {
-        return $this->studentInterface->addStudentToGroup($request);
-    }
-
     public function updateStudent(Request $request)
     {
         return $this->studentInterface->updateStudent($request);

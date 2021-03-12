@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class GroupSession extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'link', 'from', 'to', 'group_id'];
+
+    protected $hidden = ['group_id', 'created_at', 'updated_at'];
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+
 }

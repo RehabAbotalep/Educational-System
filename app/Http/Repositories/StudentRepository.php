@@ -9,6 +9,7 @@ use App\Http\Traits\UserTrait;
 use App\Models\GroupStudent;
 use App\Models\Role;
 use App\Models\User;
+use App\Rules\ValidGroupId;
 use Illuminate\Validation\Rule;
 use Validator;
 use Hash;
@@ -21,10 +22,15 @@ class StudentRepository implements StudentInterface
      * @var User
      */
     private $user;
+    /**
+     * @var GroupStudent
+     */
+    private $groupStudent;
 
-    public function __construct(User $user)
+    public function __construct(User $user, GroupStudent $groupStudent)
     {
         $this->user = $user;
+        $this->groupStudent = $groupStudent;
     }
 
     public function getAllStudents()
@@ -40,10 +46,21 @@ class StudentRepository implements StudentInterface
             'email' => 'required|email|unique:users',
             'phone' => 'required',
             'password' => 'required',
+            'groups.*' => 'required|min:3',
+            //'groups' => 'group_exist',
+            'groups' => ['required', new ValidGroupId()],
         ]);
 
         if($validator->fails()){
             return $this->apiResponse(422,'Error',$validator->errors());
+        }
+        $groups = $request->groups;
+        for($i=0; $i < count($groups); $i++){
+            for($j = $i+1; $j <= count($groups)-1; $j++){
+                if($groups[$i][0] == $groups[$j][0]){
+                    return $this->apiResponse(422, 'Validation Error', 'Group is Exist');
+                }
+            }
         }
 
         $student = $this->user->create([
@@ -53,25 +70,24 @@ class StudentRepository implements StudentInterface
             'password' => Hash::make($request->password),
             'role_id' => Role::where('is_staff', 0)->where('is_teacher', 0)->value('id'),
         ]);
-        if($request->has('groups')){
-            foreach($request->groups as $group){
 
-                $this->addStudentToGroup($group, $student->id);
-            }
+        foreach($request->groups as $group){
 
+            $this->addStudentToGroup($group, $student->id);
         }
+
 
         return $this->apiResponse(200,'Added Successfully');
     }
 
     private function addStudentToGroup($group, $student_id)
     {
-        $addedGroup = explode(',', $group);
+       // $addedGroup = explode(',', $group);
         GroupStudent::create([
             'student_id' => $student_id,
-            'group_id'   => $addedGroup[0],
-            'count'      => $addedGroup[1],
-            'price'      => $addedGroup[2],
+            'group_id'   => $group[0],
+            'count'      => $group[1],
+            'price'      => $group[2],
         ]);
     }
 
@@ -85,7 +101,7 @@ class StudentRepository implements StudentInterface
             ],
             'phone' => 'required',
             'password' => 'required',
-            'role_id' => 'required|exists:roles,id',
+            'groups' => 'nullable|group_exist',
         ]);
 
         if($validator->fails()){
@@ -101,21 +117,18 @@ class StudentRepository implements StudentInterface
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
         ]);
+        $requestedGroups = [];
         if($request->has('groups')){
             foreach($request->groups as $group){
-                $addedGroup = explode(',', $group);
-                $studentGroup = GroupStudent::where('student_id', $student->id)
-                                            ->where('group_id', $addedGroup[0])
+                //$addedGroup = explode(',', $group);
+                $requestedGroups[] = $group[0];
+                $studentGroup = $this->groupStudent::where('student_id', $student->id)
+                                            ->where('group_id', $group[0])
                                             ->first();
                 if($studentGroup){
-                    if($addedGroup[3] == 1){
-                        $studentGroup->delete();
-                    }else{
-                        $studentGroup->update(['count' => $addedGroup[1], 'price' =>$addedGroup[2] ]);
 
-                    }
+                    $studentGroup->update(['count' => $group[1], 'price' =>$group[2] ]);
                 }else{
                     $this->addStudentToGroup($group, $student->id);
                 }
@@ -131,6 +144,10 @@ class StudentRepository implements StudentInterface
                 }*/
             }
         }
+        $studentGroups = $this->groupStudent::whereNotIn('group_id', $requestedGroups)
+                                            ->where('student_id', $request->student_id)
+                                            ->delete();
+
         return $this->apiResponse(200,'Updated Successfully');
     }
 
