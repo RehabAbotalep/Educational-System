@@ -54,6 +54,7 @@ class SessionRepository implements SessionInterface
     }
 
     /* can't understand scenario behind session in general*/
+    //dont hard delete it(soft-delete)
 
     public function deleteSession($request)
     {

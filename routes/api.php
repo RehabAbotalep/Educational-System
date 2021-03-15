@@ -41,6 +41,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'roles:admin'], function () {
     Route::get('staff/show', [StaffController::class, 'getStaff']);
     Route::post('staff/delete', [StaffController::class, 'deleteStaff']);
 
+    //////////////////////////////Session Routes///////////////////////
+    Route::get('sessions/all', [SessionController::class, 'allSessions']);
+    Route::post('session/add', [SessionController::class, 'addSession']);
+    Route::post('session/delete', [SessionController::class, 'deleteSession']);
+
     //////////////////////////////Complaints Routes///////////////////////
     Route::get('complaints/all', [ComplaintController::class, 'allComplaints']);
     Route::get('complaint/show', [ComplaintController::class, 'getComplaint']);
@@ -76,14 +81,5 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['jwt.token', 'roles:admi
     Route::post('student/delete', [StudentController::class, 'deleteStudent']);
 });
 
-Route::group(['prefix' => 'dashboard', 'middleware' => ['jwt.token', 'roles:admin.teacher']], function () {
-
-    //////////////////////////////Session Routes///////////////////////
-    Route::get('sessions/all', [SessionController::class, 'allSessions']);
-    Route::post('session/add', [SessionController::class, 'addSession']);
-    Route::post('session/delete', [SessionController::class, 'deleteSession']);
-
-
-});
 
 
