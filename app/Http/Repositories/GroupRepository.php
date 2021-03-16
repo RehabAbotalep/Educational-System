@@ -9,6 +9,10 @@ use App\Http\Resources\GroupResource;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\Upload;
 use App\Models\Group;
+use App\Models\GroupDate;
+use App\Rules\ValidDay;
+use App\Rules\ValidGroupId;
+use Illuminate\Validation\Rule;
 use Validator;
 
 class GroupRepository implements GroupInterface
@@ -39,20 +43,45 @@ class GroupRepository implements GroupInterface
             'body' => 'required|min:5',
             'image' => 'required',
             'teacher_id' => 'required|exists:users,id',
+            'dates' => ['required', new ValidDay()],
         ]);
 
         if($validator->fails()){
             return $this->apiResponse(422,'Error',$validator->errors());
         }
+        /* validate that day is not duplicated*/
+        $dates = $request->dates;
+        for($i=0; $i < count($dates); $i++){
+            for($j = $i+1; $j <= count($dates)-1; $j++){
+                if($dates[$i][0] == $dates[$j][0]){
+                    return $this->apiResponse(422, 'Validation Error', 'Day is Exist');
+                }
+            }
+        }
 
-        $this->group->create([
+        $group = $this->group->create([
             'name' => $request->name,
             'body' => $request->body,
             'image' => $this->upload('groups', $request->image),
             'teacher_id' => $request->teacher_id,
             'created_by' => auth('api')->id(),
         ]);
+        $this->addGroupDates($request->dates, $group->id);
+
         return $this->apiResponse(200,'Added Successfully');
+    }
+
+    private function addGroupDates($dates, $group_id)
+    {
+        foreach($dates as $date){
+            GroupDate::create([
+                'day' => $date[0],
+                'from' => $date[1],
+                'to'   => $date[2],
+                'group_id' => $group_id
+
+            ]);
+        }
     }
 
     public function updateGroup($request)

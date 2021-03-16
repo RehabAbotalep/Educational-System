@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 use App\Http\Interfaces\StudentInterface;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\UserTrait;
+use App\Models\Attendance;
 use App\Models\GroupStudent;
 use App\Models\Role;
 use App\Models\User;
@@ -26,11 +27,16 @@ class StudentRepository implements StudentInterface
      * @var GroupStudent
      */
     private $groupStudent;
+    /**
+     * @var Attendance
+     */
+    private $attendance;
 
-    public function __construct(User $user, GroupStudent $groupStudent)
+    public function __construct(User $user, GroupStudent $groupStudent, Attendance $attendance)
     {
         $this->user = $user;
         $this->groupStudent = $groupStudent;
+        $this->attendance = $attendance;
     }
 
     public function getAllStudents()
@@ -182,5 +188,32 @@ class StudentRepository implements StudentInterface
 
         $student = $this->user::staffTeacher(0, 0)->find($request->student_id)->delete();
         return $this->apiResponse(200,'Deleted Successfully');
+    }
+
+    public function saveAttendance($request)
+    {
+        $validator = Validator::make($request->all(),[
+            'session_id' => 'required|exists:group_sessions,id',
+        ]);
+
+        if($validator->fails()){
+            return $this->apiResponse(422,'Error',$validator->errors());
+        }
+
+        $studentId = auth()->id();
+
+        $userAttendance = $this->attendance::where('student_id', $studentId)
+                                            ->where('session_id', $request->session_id)
+                                            ->first();
+        if($userAttendance){
+            return $this->apiResponse(422,'You have already save attendance for this session');
+        }
+
+        $this->attendance::create([
+            'session_id' => $request->session_id,
+            'student_id' => $studentId
+        ]);
+        return $this->apiResponse(200,'Added Successfully');
+
     }
 }

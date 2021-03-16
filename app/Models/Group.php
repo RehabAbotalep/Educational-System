@@ -25,4 +25,14 @@ class Group extends Model
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
+
+    public function dates()
+    {
+        return $this->hasMany(GroupDate::class);
+    }
+
+    public function groupStudents()
+    {
+        return $this->hasMany(GroupStudent::class, 'group_id');
+    }
 }

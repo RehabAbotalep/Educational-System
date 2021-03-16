@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Interfaces\SessionInterface;
 use App\Http\Traits\ApiResponse;
+use App\Models\Attendance;
 use App\Models\GroupSession;
 use App\Models\GroupStudent;
 use Validator;
@@ -18,15 +19,20 @@ class SessionRepository implements SessionInterface
      * @var GroupSession
      */
     private $groupSession;
+    /**
+     * @var GroupStudent
+     */
+    private $groupStudent;
 
-    public function __construct(GroupSession $groupSession)
+    public function __construct(GroupSession $groupSession, GroupStudent $groupStudent)
     {
         $this->groupSession = $groupSession;
+        $this->groupStudent = $groupStudent;
     }
 
     public function allSessions()
     {
-        $sessions = $this->groupSession->with('group:id,name')->get();
+        $sessions = $this->groupSession::whereIsDeleted(0)->with('group:id,name')->get();
         return $this->apiResponse(200, 'All Sessions', null, $sessions);
     }
 
@@ -49,7 +55,10 @@ class SessionRepository implements SessionInterface
             'to' => $request->to,
             'group_id' => $request->group_id,
         ]);
-        GroupStudent::where('group_id', $request->group_id)->decrement("count");
+        $this->groupStudent::where('group_id', $request->group_id)
+                    ->where('count', '>' , 0)
+                    ->decrement("count");
+
         return $this->apiResponse(200, 'Added successfully');
     }
 
@@ -66,10 +75,16 @@ class SessionRepository implements SessionInterface
             return $this->apiResponse(422,'Error',$validator->errors());
         }
         $session = $this->groupSession->find($request->session_id);
-        if(! $this->validateAvailableTimeToDeleteSession($session)){
+
+        $sessionAttendance = Attendance::where('session_id', $session->id )->count();
+
+        if(! $this->validateAvailableTimeToDeleteSession($session)|| $sessionAttendance > 0){
             return $this->apiResponse(422, 'can\'t delete this session');
         }
-        $session->delete();
+        $session->update(['is_deleted' => 1]);
+        $this->groupStudent::where('group_id', $session->group_id)
+                    ->increment("count");
+
         return $this->apiResponse(200,'Deleted Successfully');
     }
 

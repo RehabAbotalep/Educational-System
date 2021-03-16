@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\StudentController;
 use App\Http\Controllers\Api\Admin\SubscriptionController;
 use App\Http\Controllers\Api\Admin\TeacherController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EndUser\EndUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +34,7 @@ Route::group([
 
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => 'roles:admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['jwt.token', 'roles:admin']], function () {
     //////////////////////////////Staff Routes///////////////////////
     Route::get('staff/all', [StaffController::class, 'getAllStaff']);
     Route::post('staff/add', [StaffController::class, 'addStaff']);
@@ -80,6 +81,22 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['jwt.token', 'roles:admi
     Route::get('student/show', [StudentController::class, 'getStudent']);
     Route::post('student/delete', [StudentController::class, 'deleteStudent']);
 });
+
+Route::group(['prefix' => 'endUser', 'middleware' => ['jwt.token', 'roles:student.teacher']], function () {
+    //Take user attendance for specific session
+
+    Route::post('attendance/take', [\App\Http\Controllers\Api\EndUser\StudentController::class, 'saveAttendance']);
+    Route::post('complaints/send', [EndUserController::class, 'sendComplaint']);
+    Route::get('schedule', [EndUserController::class, 'schedule']);
+    Route::get('group/timelines', [EndUserController::class, 'groupTimeline']);
+    Route::post('discussion/add', [EndUserController::class, 'addDiscussion']);
+    Route::get('discussion/all', [EndUserController::class, 'allDiscussion']);
+    Route::post('discussion/comment', [EndUserController::class, 'discussionComment']);
+
+
+});
+
+
 
 
 
