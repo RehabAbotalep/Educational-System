@@ -42,6 +42,7 @@ class ExamRepository implements ExamInterface
             'end'  => 'required',
             'time'  => 'required',
             'degree'  => 'required',
+            'count' => 'required',
             'type_id'  => 'required|exists:exam_types,id',
             'group_id'  => 'required|exists:groups,id',
 
@@ -56,6 +57,7 @@ class ExamRepository implements ExamInterface
             'end' => $request->end,
             'time' => $request->time,
             'degree' => $request->degree,
+            'count' => $request->count,
             'type_id' => $request->type_id,
             'group_id' => $request->group_id,
             'teacher_id' => auth()->id(),
@@ -102,6 +104,7 @@ class ExamRepository implements ExamInterface
             'end'  => 'required',
             'time'  => 'required',
             'degree'  => 'required',
+            'count' => 'required',
             'exam_id'  => 'required|exists:exams,id',
             'group_id'  => 'required|exists:groups,id',
 
@@ -118,6 +121,7 @@ class ExamRepository implements ExamInterface
             'end' => $request->end,
             'time' => $request->time,
             'degree' => $request->degree,
+            'count' => $request->count,
             'group_id' => $request->group_id,
             'teacher_id' => auth()->id(),
         ]);

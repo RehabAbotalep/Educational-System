@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EndUser\EndUserController;
 use App\Http\Controllers\Api\EndUser\ExamController;
 use App\Http\Controllers\Api\EndUser\QuestionController;
+use App\Http\Controllers\Api\EndUser\StudentExamController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,9 +85,18 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['jwt.token', 'roles:Admi
     Route::post('student/delete', [StudentController::class, 'deleteStudent']);
 });
 
-Route::group(['prefix' => 'endUser', 'middleware' => ['jwt.token', 'roles:Student.Teacher']], function () {
-    //Take user attendance for specific session
+Route::group(['prefix' => 'student', 'middleware' => ['jwt.token', 'roles:Student']], function () {
     Route::post('attendance/take', [\App\Http\Controllers\Api\EndUser\StudentController::class, 'saveAttendance']);
+
+    /////////////////////////////Exams Routes///////////////////////
+    Route::get('exams/new', [StudentExamController::class, 'newExams']);
+    Route::get('exams/student/new', [StudentExamController::class, 'newStudentExam']);
+    Route::post('exams/student/store', [StudentExamController::class, 'storeStudentExam']);
+
+
+});
+
+Route::group(['prefix' => 'endUser', 'middleware' => ['jwt.token', 'roles:Student.Teacher']], function () {
 
     Route::post('complaints/send', [EndUserController::class, 'sendComplaint']);
     Route::get('schedule', [EndUserController::class, 'schedule']);
@@ -95,28 +105,21 @@ Route::group(['prefix' => 'endUser', 'middleware' => ['jwt.token', 'roles:Studen
     Route::get('discussion/all', [EndUserController::class, 'allDiscussion']);
     Route::post('discussion/comment', [EndUserController::class, 'discussionComment']);
 
-    /////////////////////////////Exams Routes///////////////////////
+});
+
+Route::group(['prefix' => 'teacher', 'middleware' => ['jwt.token', 'roles:Teacher']], function () {
     Route::get('exams/types', [ExamController::class, 'examTypes']);
     Route::get('exams/all', [ExamController::class, 'allExams']);
+    Route::post('exam/add', [ExamController::class, 'addExam']);
+    Route::post('exam/update', [ExamController::class, 'updateExam']);
+    Route::post('exam/delete', [ExamController::class, 'deleteExam']);
+    Route::post('exam/status/update', [ExamController::class, 'updateExamStatus']);
 
+    /////////////////////////////Questions Routes///////////////////////
     Route::post('questions/all', [QuestionController::class, 'allQuestions']);
-
-    Route::group([ 'middleware' => ['jwt.token', 'roles:Teacher']], function () {
-        Route::post('exam/add', [ExamController::class, 'addExam']);
-        Route::post('exam/update', [ExamController::class, 'updateExam']);
-        Route::post('exam/delete', [ExamController::class, 'deleteExam']);
-        Route::post('exam/status/update', [ExamController::class, 'updateExamStatus']);
-
-        /////////////////////////////Questions Routes///////////////////////
-        Route::post('question/add', [QuestionController::class, 'addQuestion']);
-        Route::post('question/update', [QuestionController::class, 'updateQuestion']);
-        Route::post('question/delete', [QuestionController::class, 'deleteQuestion']);
-
-
-    });
-
-
-
+    Route::post('question/add', [QuestionController::class, 'addQuestion']);
+    Route::post('question/update', [QuestionController::class, 'updateQuestion']);
+    Route::post('question/delete', [QuestionController::class, 'deleteQuestion']);
 
 
 });

@@ -11,10 +11,15 @@ class Question extends Model
 
     protected $fillable = ['exam_id', 'title'];
 
-    protected $hidden  = ['created_at', 'updated_at'];
+    protected $hidden  = ['created_at', 'updated_at', 'exam_id'];
 
     public function image()
     {
         return $this->hasOne(QuestionImage::class);
+    }
+
+    public function systemAnswer()
+    {
+        return $this->hasOne(SystemAnswer::class, 'question_id');
     }
 }

@@ -10,4 +10,6 @@ class QuestionImage extends Model
     use HasFactory;
 
     protected $fillable = ['image', 'question_id'];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }
