@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class ComplaintRepository implements ComplaintInterface
 {
     use ApiResponse;
-    /**
-     * @var Complaint
-     */
+
     private $complaint;
 
     public function __construct(Complaint $complaint)

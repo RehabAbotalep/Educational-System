@@ -15,13 +15,7 @@ class SessionRepository implements SessionInterface
 {
     use ApiResponse;
 
-    /**
-     * @var GroupSession
-     */
     private $groupSession;
-    /**
-     * @var GroupStudent
-     */
     private $groupStudent;
 
     public function __construct(GroupSession $groupSession, GroupStudent $groupStudent)

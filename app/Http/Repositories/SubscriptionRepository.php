@@ -12,9 +12,7 @@ use App\Models\GroupStudent;
 class SubscriptionRepository implements SubscriptionInterface
 {
     use ApiResponse;
-    /**
-     * @var GroupStudent
-     */
+
     private $groupStudent;
 
     public function __construct(GroupStudent $groupStudent)

@@ -17,9 +17,7 @@ use Hash;
 class StaffRepository implements StaffInterface
 {
     use ApiResponse, UserTrait;
-    /**
-     * @var User
-     */
+
     private $user;
 
     public function __construct(User $user)

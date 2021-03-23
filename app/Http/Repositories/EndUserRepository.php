@@ -17,17 +17,8 @@ class EndUserRepository implements EndUserInterface
 {
     use ApiResponse;
 
-    /**
-     * @var Complaint
-     */
     private $complaint;
-    /**
-     * @var Discussion
-     */
     private $discussion;
-    /**
-     * @var Group
-     */
     private $group;
 
     public function __construct(Complaint $complaint, Group $group, Discussion $discussion)
@@ -62,10 +53,10 @@ class EndUserRepository implements EndUserInterface
         $userRole = $user->role->name;
         $userId =  $user->id;
 
-        if($userRole == 'teacher'){
+        if($userRole == 'Teacher'){
             $userSchedule  = $this->group::where('teacher_id', $userId);
 
-        }else if($userRole == 'student'){
+        }else if($userRole == 'Student'){
 
             $userSchedule  = $this->group::whereHas('groupStudents', function($query) use ($userId){
                 $query->where('student_id', $userId);

@@ -19,9 +19,6 @@ class GroupRepository implements GroupInterface
 {
     use ApiResponse, Upload;
 
-    /**
-     * @var User
-     */
     private $group;
 
     public function __construct(Group $group)

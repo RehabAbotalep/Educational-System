@@ -7,7 +7,9 @@ namespace App\Http\Repositories;
 use App\Http\Interfaces\TeacherInterface;
 use App\Http\Traits\ApiResponse;
 use App\Http\Traits\UserTrait;
+use App\Models\Role;
 use App\Models\User;
+use App\Rules\ValidGroupId;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Validator;
@@ -17,9 +19,6 @@ class TeacherRepository implements TeacherInterface
 {
     use ApiResponse, UserTrait;
 
-    /**
-     * @var User
-     */
     private $user;
 
     public function __construct(User $user)
@@ -35,7 +34,22 @@ class TeacherRepository implements TeacherInterface
 
     public function addTeacher($request)
     {
-        return $this->addUser($request, $this->user);
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'phone' => 'required',
+            'password' => 'required',
+        ]);
+
+       $this->user->create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'role_id' => Role::where('is_staff', 0)->where('is_teacher', 1)->value('id'),
+       ]);
+
+        return $this->apiResponse(200,'Added Successfully');
     }
 
     public function updateTeacher($request)

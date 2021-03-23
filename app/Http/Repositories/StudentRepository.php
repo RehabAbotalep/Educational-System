@@ -19,17 +19,8 @@ class StudentRepository implements StudentInterface
 {
     use ApiResponse , UserTrait;
 
-    /**
-     * @var User
-     */
     private $user;
-    /**
-     * @var GroupStudent
-     */
     private $groupStudent;
-    /**
-     * @var Attendance
-     */
     private $attendance;
 
     public function __construct(User $user, GroupStudent $groupStudent, Attendance $attendance)
