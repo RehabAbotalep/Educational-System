@@ -50,7 +50,7 @@ class ExamRepository implements ExamInterface
         if($validator->fails()){
             return $this->apiResponse(422,'Error',$validator->errors());
         }
-        $this->exam->create([
+        $this->exam::create([
             'name' => $request->name,
             'start' => $request->start,
             'end' => $request->end,
@@ -89,7 +89,7 @@ class ExamRepository implements ExamInterface
         if($validator->fails()){
             return $this->apiResponse(422,'Error',$validator->errors());
         }
-        $exam = $this->exam::find($request->exam_id)->delete();
+        $this->exam::find($request->exam_id)->delete();
 
         return $this->apiResponse(200,'Deleted');
     }

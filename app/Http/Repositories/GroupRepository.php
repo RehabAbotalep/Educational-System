@@ -56,7 +56,7 @@ class GroupRepository implements GroupInterface
             }
         }
 
-        $group = $this->group->create([
+        $group = $this->group::create([
             'name' => $request->name,
             'body' => $request->body,
             'image' => $this->upload('groups', $request->image),

@@ -41,7 +41,7 @@ class TeacherRepository implements TeacherInterface
             'password' => 'required',
         ]);
 
-       $this->user->create([
+       $this->user::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,

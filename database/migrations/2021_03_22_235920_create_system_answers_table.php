@@ -20,9 +20,6 @@ class CreateSystemAnswersTable extends Migration
             $table->bigInteger('question_id')->unsigned();
             $table->foreign('question_id')->references('id')->on('questions')->onDelete('cascade');
 
-            $table->bigInteger('type_id')->unsigned();
-            $table->foreign('type_id')->references('id')->on('exam_types')->onDelete('cascade');
-
             $table->timestamps();
         });
     }

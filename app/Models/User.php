@@ -65,7 +65,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function role()
     {
         return $this->belongsTo(Role::class);
     }
@@ -79,7 +79,7 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
-    public function groups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function groups()
     {
         return $this->hasMany(GroupStudent::class,'student_id');
     }

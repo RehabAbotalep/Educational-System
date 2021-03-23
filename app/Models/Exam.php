@@ -15,4 +15,17 @@ class Exam extends Model
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
+
+    public function type()
+    {
+        return $this->belongsTo(ExamType::class, 'type_id');
+    }
+
+    /*Automated marked Exams scope*/
+    public function scopeAutomatedMarked($query, $is_automated_marked)
+    {
+        return $query->whereHas('type', function($query) use($is_automated_marked){
+            $query->where('automated_marked', $is_automated_marked);
+        });
+    }
 }

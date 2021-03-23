@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Admin\TeacherController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EndUser\EndUserController;
 use App\Http\Controllers\Api\EndUser\ExamController;
+use App\Http\Controllers\Api\EndUser\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -98,11 +99,19 @@ Route::group(['prefix' => 'endUser', 'middleware' => ['jwt.token', 'roles:Studen
     Route::get('exams/types', [ExamController::class, 'examTypes']);
     Route::get('exams/all', [ExamController::class, 'allExams']);
 
+    Route::post('questions/all', [QuestionController::class, 'allQuestions']);
+
     Route::group([ 'middleware' => ['jwt.token', 'roles:Teacher']], function () {
         Route::post('exam/add', [ExamController::class, 'addExam']);
         Route::post('exam/update', [ExamController::class, 'updateExam']);
         Route::post('exam/delete', [ExamController::class, 'deleteExam']);
         Route::post('exam/status/update', [ExamController::class, 'updateExamStatus']);
+
+        /////////////////////////////Questions Routes///////////////////////
+        Route::post('question/add', [QuestionController::class, 'addQuestion']);
+        Route::post('question/update', [QuestionController::class, 'updateQuestion']);
+        Route::post('question/delete', [QuestionController::class, 'deleteQuestion']);
+
 
     });
 

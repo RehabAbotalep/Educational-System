@@ -42,7 +42,8 @@ class SessionRepository implements SessionInterface
         if($validation->fails()){
             return $this->apiResponse(422, 'Error', $validation->errors());
         }
-        $this->groupSession->create([
+
+        $this->groupSession::create([
             'name' => $request->name,
             'link' => $request->link,
             'from' => $request->from,
