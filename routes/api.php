@@ -90,6 +90,7 @@ Route::group(['prefix' => 'student', 'middleware' => ['jwt.token', 'roles:Studen
 
     /////////////////////////////Exams Routes///////////////////////
     Route::get('exams/new', [StudentExamController::class, 'newExams']);
+    Route::get('exams/old', [StudentExamController::class, 'oldExams']);
     Route::get('exams/student/new', [StudentExamController::class, 'newStudentExam']);
     Route::post('exams/student/store', [StudentExamController::class, 'storeStudentExam']);
 
@@ -114,6 +115,10 @@ Route::group(['prefix' => 'teacher', 'middleware' => ['jwt.token', 'roles:Teache
     Route::post('exam/update', [ExamController::class, 'updateExam']);
     Route::post('exam/delete', [ExamController::class, 'deleteExam']);
     Route::post('exam/status/update', [ExamController::class, 'updateExamStatus']);
+    Route::get('exam/students', [ExamController::class, 'examStudents']);
+    Route::get('exam/students/details', [ExamController::class, 'examStudentDetails']);
+
+    Route::post('student/answers/mark', [ExamController::class, 'markStudentEssayExamAnswers']);
 
     /////////////////////////////Questions Routes///////////////////////
     Route::post('questions/all', [QuestionController::class, 'allQuestions']);

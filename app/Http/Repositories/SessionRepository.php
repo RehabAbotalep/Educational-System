@@ -57,9 +57,7 @@ class SessionRepository implements SessionInterface
         return $this->apiResponse(200, 'Added successfully');
     }
 
-    /* can't understand scenario behind session in general*/
     //dont hard delete it(soft-delete)
-
     public function deleteSession($request)
     {
         $validator = Validator::make($request->all(),[
@@ -78,12 +76,12 @@ class SessionRepository implements SessionInterface
         }
         $session->update(['is_deleted' => 1]);
         $this->groupStudent::where('group_id', $session->group_id)
-                    ->increment("count");
+                            ->increment("count");
 
         return $this->apiResponse(200,'Deleted Successfully');
     }
 
-    private function validateAvailableTimeToDeleteSession($session): bool
+    public function validateAvailableTimeToDeleteSession($session): bool
     {
         $currentDateTime = now();
         $currentTime = $currentDateTime->format('H:i');

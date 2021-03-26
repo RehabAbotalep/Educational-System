@@ -5,11 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SystemAnswer extends Model
+class ExamMark extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question_id', 'answer'];
-
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $fillable = ['student_exam_id'];
 }

@@ -17,7 +17,7 @@ use Hash;
 
 class StudentRepository implements StudentInterface
 {
-    use ApiResponse , UserTrait;
+    use ApiResponse;
 
     private $user;
     private $groupStudent;

@@ -22,13 +22,15 @@ class StudentExamRepository implements StudentExamInterface
     private $question;
     private $studentExam;
     private $systemAnswer;
+    private $studentExamAnswer;
 
-    public function __construct(Exam $exam, Question $question, StudentExam $studentExam, SystemAnswer $systemAnswer)
+    public function __construct(Exam $exam, Question $question, StudentExam $studentExam, SystemAnswer $systemAnswer, StudentExamAnswer $studentExamAnswer)
     {
         $this->exam = $exam;
         $this->question = $question;
         $this->studentExam = $studentExam;
         $this->systemAnswer = $systemAnswer;
+        $this->studentExamAnswer = $studentExamAnswer;
     }
 
     public function newExams()
@@ -36,12 +38,19 @@ class StudentExamRepository implements StudentExamInterface
         $newExams = $this->exam::closed(0)->whereHas('studentGroups', function($query){
             $query->where('student_id', auth()->id())->where('count', '>', 0);
         })->get();
+
         return $this->apiResponse(200, 'New Exams', null, $newExams);
     }
 
     public function oldExams()
     {
-        // TODO: Implement oldExams() method.
+        $user_id = auth()->id();
+        //separate answers in another end point
+        $oldExams = $this->exam::closed(1)->whereHas('studentExams', function ($query) use($user_id){
+            $query->where('student_id', $user_id);
+        })->with('studentExams.studentExamAnswers')->get();
+
+        return $this->apiResponse(200, 'Old Exams', null, $oldExams);
     }
 
     public function newStudentExam($request)
@@ -53,10 +62,10 @@ class StudentExamRepository implements StudentExamInterface
         if($validator->fails()){
             return $this->apiResponse(422,'Error',$validator->errors());
         }
-        $exam = $this->exam::select('count')->find($request->exam_id);
+        $examCount = $this->exam::select('count')->find($request->exam_id);
 
         $questions =  $this->question::where('exam_id', $request->exam_id)
-                                     ->limit($exam->count)
+                                     ->limit($examCount->count)
                                      ->with('image')
                                      ->get();
 
@@ -74,7 +83,6 @@ class StudentExamRepository implements StudentExamInterface
         if($exam){
             $questionDegree = $exam->question_degree;
             $totalDegree = 0;
-
             foreach ($request->questions as $question){
                 $questionSystemAnswer = $this->systemAnswer::where('question_id', $question['question'])->value('answer');
 
@@ -84,11 +92,7 @@ class StudentExamRepository implements StudentExamInterface
                 }else{
                     $degree = 0;
                 }
-                StudentExamAnswer::create([
-                    'student_exam_id' => $studentExam->id,
-                    'question_id' => $question['question'],
-                    'degree' => $degree,
-                ]);
+                $this->addStudentExamAnswer($studentExam->id, $question['question'], $question['answer'], $degree);
             }
             $studentExam->update([
                 'total_degree' => $totalDegree
@@ -96,12 +100,14 @@ class StudentExamRepository implements StudentExamInterface
         }
         /*Essays*/
         else{
-
+            foreach ($request->questions as $question){
+                $this->addStudentExamAnswer($studentExam->id, $question['question'], $question['answer'], 0);
+            }
         }
         return $this->apiResponse(200, 'Done', null, $totalDegree);
     }
 
-    public function addStudentExam($exam_id)
+    private function addStudentExam($exam_id)
     {
         $studentExam = $this->studentExam::create([
             'exam_id' => $exam_id,
@@ -109,5 +115,18 @@ class StudentExamRepository implements StudentExamInterface
         ]);
         return $studentExam;
     }
+
+    private function addStudentExamAnswer($student_exam_id, $question, $answer, $degree)
+    {
+        $this->studentExamAnswer::create([
+            'student_exam_id' => $student_exam_id,
+            'question_id' => $question,
+            'answer' => $answer,
+            'degree' => $degree,
+        ]);
+    }
+
+
+
 
 }

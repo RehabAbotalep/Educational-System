@@ -12,5 +12,7 @@ interface ExamInterface
     public function deleteExam($request);
     public function updateExam($request);
     public function updateExamStatus($request);
-
+    public function examStudents($request);
+    public function examStudentDetails($request);
+    public function markStudentEssayExamAnswers($request);
 }

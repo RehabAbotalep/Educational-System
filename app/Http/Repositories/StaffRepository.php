@@ -25,7 +25,6 @@ class StaffRepository implements StaffInterface
         $this->user = $user;
     }
 
-    /* get All Staffs */
     public function getAllStaff()
     {
         //filter by role
@@ -34,13 +33,13 @@ class StaffRepository implements StaffInterface
         return $this->apiResponse(200,'All Staff',null, $staff);
     }
 
-    /* Add Staff */
+
     public function addStaff($request)
     {
         return $this->addUser($request, $this->user);
     }
 
-    /*update Staff*/
+
     public function updateStaff($request)
     {
         $validator = Validator::make($request->all(),[
@@ -88,7 +87,7 @@ class StaffRepository implements StaffInterface
         return $this->apiResponse(200,'Deleted Successfully');
     }
 
-    /*show Staff*/
+
     public function getStaff($request)
     {
         $validator = Validator::make($request->all(),[

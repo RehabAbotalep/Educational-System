@@ -26,6 +26,11 @@ class Exam extends Model
         return $this->hasOne(GroupStudent::class, 'group_id', 'group_id');
     }
 
+    public function studentExams()
+    {
+        return $this->hasMany(StudentExam::class, 'exam_id');
+    }
+
     /* scope closed*/
     public function scopeClosed($query, $is_closed)
     {
