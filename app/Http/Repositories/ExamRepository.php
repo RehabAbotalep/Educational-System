@@ -246,8 +246,7 @@ class ExamRepository implements ExamInterface
             if($degree['degree'] > $exam->question_degree){
                 return $this->apiResponse(422,'Error', 'Invalid degree');
             }
-            $studentExamAnswer = $this->studentExamAnswer::find($degree['student_answer_id'])
-                                                         ->update(['degree' => $degree['degree']]);
+            $this->studentExamAnswer::find($degree['student_answer_id'])->update(['degree' => $degree['degree']]);
             $totalDegree += $degree['degree'];
         }
         /** update total degree*/
